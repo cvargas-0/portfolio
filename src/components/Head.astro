@@ -1,0 +1,225 @@
+---
+import '../styles/global.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/lora/400.css';
+import '@fontsource/lora/600.css';
+import inter400 from '@fontsource/inter/files/inter-latin-400-normal.woff2';
+import inter600 from '@fontsource/inter/files/inter-latin-600-normal.woff2';
+import lora400 from '@fontsource/lora/files/lora-latin-400-normal.woff2';
+import lora600 from '@fontsource/lora/files/lora-latin-600-normal.woff2';
+
+import { ClientRouter } from 'astro:transitions';
+import { SITE } from '@/consts';
+import { SOCIALS } from '@/consts';
+import { defaultLang, languages } from '@/i18n/ui';
+import type { Lang } from '@/i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  lang: Lang;
+  alternates: Partial<Record<Lang, string>>;
+}
+
+const {
+  title,
+  description,
+  image = '/nano.png',
+  lang,
+  alternates,
+} = Astro.props as Props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(image, Astro.site);
+
+const ogLocale = lang === 'es' ? 'es_ES' : 'en_US';
+const ogLocaleAlternates = Object.keys(languages)
+  .filter((l) => l !== lang)
+  .map((l) => (l === 'es' ? 'es_ES' : 'en_US'));
+
+const hreflangLinks = Object.keys(languages).map((l) => ({
+  lang: l,
+  href: new URL(alternates[l as Lang] ?? `/${l}`, Astro.site).href,
+}));
+
+const xDefaultHref = new URL(
+  alternates[defaultLang as Lang] ?? `/${defaultLang}`,
+  Astro.site,
+).href;
+
+const sameAs = SOCIALS.map((s) => s.HREF);
+const ldJson = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': new URL('#website', Astro.site).href,
+      url: new URL('/', Astro.site).href,
+      name: SITE.NAME,
+      inLanguage: lang,
+    },
+    {
+      '@type': 'Person',
+      '@id': new URL('#person', Astro.site).href,
+      name: SITE.NAME,
+      email: `mailto:${SITE.EMAIL}`,
+      url: new URL('/', Astro.site).href,
+      sameAs,
+    },
+    {
+      '@type': 'WebPage',
+      '@id': canonicalURL.href,
+      url: canonicalURL.href,
+      name: title,
+      description,
+      isPartOf: { '@id': new URL('#website', Astro.site).href },
+      about: { '@id': new URL('#person', Astro.site).href },
+      inLanguage: lang,
+    },
+  ],
+};
+---
+
+<!-- Global Metadata -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link
+  rel="icon"
+  type="image/svg+xml"
+  href="/favicon.svg"
+  media="(prefers-color-scheme: dark)"
+/>
+<link rel="icon" type="image/x-icon" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+<meta
+  name="robots"
+  content={import.meta.env.PROD ? 'index,follow' : 'noindex,nofollow'}
+/>
+<meta name="author" content={SITE.NAME} />
+
+<!-- Font preloads -->
+<link rel="preload" href={inter400} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={inter600} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={lora400} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={lora600} as="font" type="font/woff2" crossorigin />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+{
+  hreflangLinks.map((link) => (
+    <link rel="alternate" hreflang={link.lang} href={link.href} />
+  ))
+}
+<link rel="alternate" hreflang="x-default" href={xDefaultHref} />
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={SITE.NAME} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:locale" content={ogLocale} />
+{
+  ogLocaleAlternates.map((l) => (
+    <meta property="og:locale:alternate" content={l} />
+  ))
+}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={ogImageURL} />
+<meta property="twitter:site" content={`@${SITE.USERNAME}`} />
+<meta property="twitter:creator" content={`@${SITE.USERNAME}`} />
+
+<ClientRouter />
+
+<!-- RSS Link -->
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE.NAME}
+  href={new URL('rss.xml', Astro.site)}
+/>
+
+<script type="application/ld+json" set:html={JSON.stringify(ldJson)} />
+
+<script>
+  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+  document.addEventListener('astro:before-swap', (e) =>
+    [
+      ...(e as TransitionBeforeSwapEvent).newDocument.head.querySelectorAll(
+        'link[as="font"]',
+      ),
+    ].forEach((link) => link.remove()),
+  );
+</script>
+
+<script is:inline>
+  function init() {
+    const maybeLang = window.location.pathname.split('/').filter(Boolean)[0];
+    if (maybeLang === 'en' || maybeLang === 'es') {
+      try {
+        localStorage.setItem('preferredLang', maybeLang);
+      } catch {}
+    }
+
+    onScroll();
+    animate();
+
+    const backToTop = document.getElementById('back-to-top');
+    backToTop?.addEventListener('click', (event) => scrollToTop(event));
+
+    const backToPrev = document.getElementById('back-to-prev');
+    backToPrev?.addEventListener('click', () => window.history.back());
+
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (event) => {
+        if (localStorage.theme === 'system' || !localStorage.theme) {
+          toggleTheme(event.matches);
+        }
+      });
+
+    document.addEventListener('scroll', onScroll);
+  }
+
+  function animate() {
+    const animateElements = document.querySelectorAll('.animate');
+
+    animateElements.forEach((element, index) => {
+      setTimeout(() => {
+        element.classList.add('show');
+      }, index * 150);
+    });
+  }
+
+  function onScroll() {
+    if (window.scrollY > 0) {
+      document.documentElement.classList.add('scrolled');
+    } else {
+      document.documentElement.classList.remove('scrolled');
+    }
+  }
+
+  function scrollToTop(event) {
+    event.preventDefault();
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => init());
+  document.addEventListener('astro:after-swap', () => init());
+</script>

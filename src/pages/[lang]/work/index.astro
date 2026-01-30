@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import Container from '@/components/Container.astro';
+import { dateRange } from '@/lib/utils';
+import { useTranslations } from '@/i18n/utils';
+
+export async function getStaticPaths() {
+  return [{ params: { lang: 'es' } }, { params: { lang: 'en' } }];
+}
+
+const { lang } = Astro.params;
+const t = useTranslations(lang as 'en' | 'es');
+
+const collection = (await getCollection('work')).sort(
+  (a, b) =>
+    new Date(b.data.dateStart).valueOf() - new Date(a.data.dateStart).valueOf(),
+);
+
+const work = await Promise.all(
+  collection
+    .filter((item) => item.data.lang === lang)
+    .map(async (item) => {
+      const { Content } = await item.render();
+      return { ...item, Content };
+    }),
+);
+---
+
+<Layout title={t('work.title')} description={t('work.description')}>
+  <Container>
+    <div class="space-y-10">
+      <div class="font-semibold text-black dark:text-white animate">
+        {t('work.title')}
+      </div>
+      {
+        work.length === 0 ? (
+          <div class="text-muted-foreground text-sm animate">
+            {t('empty.work')}
+          </div>
+        ) : (
+          <ul class="flex flex-col gap-6">
+            {work.map((entry) => (
+              <li class="animate">
+                <div class="group hover:bg-black/5 dark:hover:bg-white/5 px-4 py-4 border border-black/15 dark:border-white/20 rounded-lg transition-colors duration-300 ease-in-out">
+                  <div class="flex flex-wrap justify-between items-baseline gap-x-6 gap-y-2">
+                    <div class="space-y-0.5">
+                      <div class="font-semibold text-black dark:text-white">
+                        {entry.data.company}
+                      </div>
+                      <div class="opacity-75 text-sm">{entry.data.role}</div>
+                    </div>
+                    <div class="opacity-75 text-sm">
+                      {dateRange(entry.data.dateStart, entry.data.dateEnd)}
+                    </div>
+                  </div>
+                  <article class="mt-4">
+                    <entry.Content />
+                  </article>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </Container>
+</Layout>

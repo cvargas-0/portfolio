@@ -1,0 +1,66 @@
+---
+import Container from '@/components/Container.astro';
+import { SITE } from '@/consts';
+import BackToTop from '@/components/BackToTop.astro';
+import { getLangFromUrl, getRouteFromUrl, localizePath, type Lang } from '@/i18n/utils';
+import { useTranslations } from '@/i18n/utils';
+
+type Props = {
+  alternates?: Partial<Record<Lang, string>>;
+};
+
+const { alternates } = Astro.props as Props;
+
+const currentYear = new Date().getFullYear();
+const route = getRouteFromUrl(Astro.url);
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const switchLangHref = (targetLang: Lang) => {
+  return alternates?.[targetLang] ?? localizePath(targetLang, route);
+};
+---
+
+<footer class="animate">
+  <Container>
+    <div class="relative">
+      <div class="-top-20 right-0 absolute">
+        <BackToTop label={t('common.backToTop')} />
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <div>
+        &copy; {currentYear} | {SITE.NAME}
+      </div>
+
+      <div class="flex items-center gap-1.5 text-muted-foreground text-xs">
+        <a
+          href={switchLangHref('en')}
+          data-lang="en"
+          class:list={[
+            'no-underline transition-colors',
+            lang === 'en'
+              ? 'text-foreground font-medium'
+              : 'text-muted-foreground hover:text-link',
+          ]}
+        >
+          EN
+        </a>
+
+        <a
+          href={switchLangHref('es')}
+          data-lang="es"
+          class:list={[
+            'no-underline transition-colors',
+            lang === 'es'
+              ? 'text-foreground font-medium'
+              : 'text-muted-foreground hover:text-link',
+          ]}
+        >
+          ES
+        </a>
+      </div>
+    </div>
+  </Container>
+</footer>

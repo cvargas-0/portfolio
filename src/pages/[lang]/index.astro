@@ -1,0 +1,210 @@
+---
+import { getCollection } from 'astro:content';
+import Container from '@/components/Container.astro';
+import Layout from '@/layouts/Layout.astro';
+import Link from '@/components/Link.astro';
+import { dateRange } from '@/lib/utils';
+import { SITE, SOCIALS } from '@/consts';
+import { stripLangFromSlug, useTranslations } from '@/i18n/utils';
+import { collections } from '@/content/config';
+
+export async function getStaticPaths() {
+  return [{ params: { lang: 'es' } }, { params: { lang: 'en' } }];
+}
+
+const { lang } = Astro.params as { lang: 'en' | 'es' };
+const t = useTranslations(lang);
+
+const blog = (await getCollection('blog'))
+  .filter((post) => !post.data.draft && post.data.lang === lang)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
+
+const projects = (await getCollection('projects'))
+  .filter((project) => !project.data.draft && project.data.lang === lang)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
+
+const allwork = (await getCollection('work'))
+  .filter((work) => work.data.lang === lang)
+  .sort(
+    (a, b) =>
+      new Date(b.data.dateStart).valueOf() -
+      new Date(a.data.dateStart).valueOf(),
+  )
+  .slice(0, SITE.NUM_WORKS_ON_HOMEPAGE);
+
+const work = allwork;
+
+const entryHref = (entry: {
+  slug: string;
+  collection: string;
+  data: { lang: 'en' | 'es' };
+}) => {
+  if (entry.collection !== 'work') {
+    return `/${entry.data.lang}/${entry.collection}/${stripLangFromSlug(entry.slug, entry.data.lang)}`;
+  }
+  return `/${entry.data.lang}/${entry.collection}`;
+};
+---
+
+<Layout title="Home" description={t('blog.description')}>
+  <Container>
+    <h4 class="font-semibold text-black dark:text-white animate">
+      {t('home.greeting')}
+      <span class="text-xl">👋🏻</span>
+    </h4>
+    <div class="space-y-16">
+      <section>
+        <article class="space-y-4">
+          <p class="animate">
+            {t('home.description.p1')}
+            {t('home.description.p2')}
+          </p>
+          <p class="animate">
+            {t('home.description.p3')}
+          </p>
+        </article>
+      </section>
+
+      <section class="space-y-6 animate">
+        <div class="flex flex-wrap justify-between items-center gap-y-2">
+          <h5 class="font-semibold text-black dark:text-white">
+            {t('home.latestPosts')}
+          </h5>
+          <Link href={`/${lang}/blog`}> {t('home.seeAllPosts')} </Link>
+        </div>
+        {
+          blog.length === 0 ? (
+            <div class="text-muted-foreground text-sm animate">
+              {t('empty.blog')}
+            </div>
+          ) : (
+            <ul class="flex flex-col gap-3">
+              {blog.map((post) => (
+                <li class="animate">
+                  <a
+                    href={entryHref(post)}
+                    class="hover:bg-black/5 dark:hover:bg-white/5 px-4 py-3 border border-black/15 dark:border-white/20 rounded-lg hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+                  >
+                    <div class="flex flex-col gap-0.5">
+                      <div class="font-semibold">{post.data.title}</div>
+                      <div class="opacity-75 text-sm">
+                        {post.data.description}
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+
+      <section class="space-y-6 animate">
+        <div class="flex flex-wrap justify-between items-center gap-y-2">
+          <h5 class="font-semibold text-black dark:text-white">
+            {t('home.workExperience')}
+          </h5>
+          <Link href={`/${lang}/work`}> {t('home.seeAllWork')} </Link>
+        </div>
+        {
+          work.length === 0 ? (
+            <div class="text-muted-foreground text-sm animate">
+              {t('empty.work')}
+            </div>
+          ) : (
+            <ul class="flex flex-col gap-3">
+              {work.map((entry) => (
+                <li class="animate">
+                  <a href={entryHref(entry)}>
+                    <div class="hover:bg-black/5 dark:hover:bg-white/5 px-4 py-3 border border-black/15 dark:border-white/20 rounded-lg transition-colors duration-300 ease-in-out">
+                      <div class="flex flex-wrap justify-between items-baseline gap-x-6 gap-y-1">
+                        <div class="font-semibold text-black dark:text-white">
+                          {entry.data.company}
+                        </div>
+                        <div class="opacity-75 text-sm">
+                          {dateRange(entry.data.dateStart, entry.data.dateEnd)}
+                        </div>
+                      </div>
+                      <div class="opacity-75 text-sm">{entry.data.role}</div>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+
+      <section class="space-y-6 animate">
+        <div class="flex flex-wrap justify-between items-center gap-y-2">
+          <h5 class="font-semibold text-black dark:text-white">
+            {t('home.recentProjects')}
+          </h5>
+          <Link href={`/${lang}/projects`}> {t('home.seeAllProjects')} </Link>
+        </div>
+        {
+          projects.length === 0 ? (
+            <div class="text-muted-foreground text-sm animate">
+              {t('empty.projects')}
+            </div>
+          ) : (
+            <ul class="flex flex-col gap-3">
+              {projects.map((entry) => (
+                <li class="animate">
+                  <a href={entryHref(entry)}>
+                    <div class="hover:bg-black/5 dark:hover:bg-white/5 px-4 py-3 border border-black/15 dark:border-white/20 rounded-lg transition-colors duration-300 ease-in-out">
+                      <div class="flex flex-wrap justify-between items-baseline gap-x-6 gap-y-1">
+                        <div class="font-semibold text-black dark:text-white">
+                          {entry.data.title}
+                        </div>
+                        <div class="opacity-75 text-sm">
+                          {entry.data.description}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+
+      <section class="space-y-4 animate">
+        <h5 class="font-semibold text-black dark:text-white">
+          {t('home.letsConnect')}
+        </h5>
+        <article>
+          <p>
+            {t('home.connectMessage')}
+          </p>
+        </article>
+        <ul class="flex flex-wrap gap-3">
+          {
+            SOCIALS.map((SOCIAL) => (
+              <li class="flex gap-x-2 text-nowrap">
+                <Link
+                  href={SOCIAL.HREF}
+                  external
+                  aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}
+                >
+                  {SOCIAL.NAME.toUpperCase()}
+                </Link>
+              </li>
+            ))
+          }
+          <li class="line-clamp-1">
+            <Link
+              href={`mailto:${SITE.EMAIL}`}
+              aria-label={`Email ${SITE.NAME}`}
+            >
+              EMAIL
+            </Link>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </Container>
+</Layout>

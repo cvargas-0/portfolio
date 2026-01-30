@@ -1,0 +1,80 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import Container from '@/components/Container.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { readingTime } from '@/lib/utils';
+import BackToPrev from '@/components/BackToPrev.astro';
+import { useTranslations } from '@/i18n/utils';
+import { stripLangFromSlug } from '@/i18n/utils';
+import Link from '@/components/Link.astro';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog'))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  const paths = [];
+  for (const post of posts) {
+    paths.push({
+      params: {
+        lang: post.data.lang,
+        slug: stripLangFromSlug(post.slug, post.data.lang),
+      },
+      props: post,
+    });
+  }
+  return paths;
+}
+
+const { lang } = Astro.params as { lang: 'en' | 'es' };
+const t = useTranslations(lang);
+const post = Astro.props as CollectionEntry<'blog'>;
+const { Content } = await post.render();
+
+const otherLang = lang === 'en' ? 'es' : 'en';
+const alternateEntry = post.data.translationKey
+  ? (await getCollection('blog'))
+      .filter((p) => !p.data.draft)
+      .find(
+        (p) =>
+          p.data.lang === otherLang &&
+          p.data.translationKey === post.data.translationKey,
+      )
+  : undefined;
+
+const alternates = {
+  [otherLang]: alternateEntry
+    ? `/${otherLang}/blog/${stripLangFromSlug(alternateEntry.slug, otherLang)}`
+    : `/${otherLang}/blog`,
+};
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  alternates={alternates}
+>
+  <Container>
+    <div class="animate">
+      <BackToPrev href={`/${lang}/blog`}> {t('nav.blog')} </BackToPrev>
+    </div>
+    <div class="space-y-1 my-10">
+      <div class="flex items-center gap-1.5 animate">
+        <div class="font-base text-sm">
+          <FormattedDate date={post.data.date} lang={lang} />
+        </div>
+        &bull;
+        <div class="font-base text-sm">
+          {readingTime(post.body, lang)}
+        </div>
+      </div>
+      <div class="font-semibold text-black dark:text-white text-2xl animate">
+        {post.data.title}
+      </div>
+    </div>
+    <article class="animate">
+      <Content />
+    </article>
+  </Container>
+</Layout>

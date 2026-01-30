@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import Container from '@/components/Container.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { readingTime } from '@/lib/utils';
+import BackToPrev from '@/components/BackToPrev.astro';
+import Link from '@/components/Link.astro';
+import { useTranslations } from '@/i18n/utils';
+import { stripLangFromSlug } from '@/i18n/utils';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths = (async () => {
+  const collection = await getCollection('projects', ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+
+  return collection.map((project) => ({
+    params: {
+      lang: project.data.lang,
+      slug: stripLangFromSlug(project.slug, project.data.lang),
+    },
+    props: { project },
+  }));
+}) satisfies GetStaticPaths;
+
+const { lang } = Astro.params as { lang: 'en' | 'es' };
+const t = useTranslations(lang);
+const { project } = Astro.props;
+const { Content } = await project.render();
+
+const otherLang = lang === 'en' ? 'es' : 'en';
+const alternateEntry = project.data.translationKey
+  ? (await getCollection('projects'))
+      .filter((p) => !p.data.draft)
+      .find(
+        (p) =>
+          p.data.lang === otherLang &&
+          p.data.translationKey === project.data.translationKey,
+      )
+  : undefined;
+
+const alternates = {
+  [otherLang]: alternateEntry
+    ? `/${otherLang}/projects/${stripLangFromSlug(
+        alternateEntry.slug,
+        otherLang,
+      )}`
+    : `/${otherLang}/projects`,
+};
+---
+
+<Layout
+  title={project.data.title}
+  description={project.data.description}
+  alternates={alternates}
+>
+  <Container>
+    <div class="animate">
+      <BackToPrev href={`/${lang}/projects`}> {t('nav.projects')} </BackToPrev>
+    </div>
+    <div class="space-y-1 my-10">
+      <div class="flex items-center gap-1.5 animate">
+        <div class="font-base text-sm">
+          <FormattedDate date={project.data.date} lang={lang} />
+        </div>
+        &bull;
+        <div class="font-base text-sm">
+          {readingTime(project.body, lang)}
+        </div>
+      </div>
+      <div class="font-semibold text-black dark:text-white text-2xl animate">
+        {project.data.title}
+      </div>
+    </div>
+    <article class="animate">
+      <Content />
+
+      <div class="flex gap-1 animate">
+        {
+          (project.data.URL || project.data.repoURL) && (
+            <nav class="flex gap-1 animate">
+              {project.data.URL && (
+                <Link href={project.data.URL} external>
+                  {t('common.URL')}
+                </Link>
+              )}
+              {project.data.URL && project.data.repoURL && <span>/</span>}
+              {project.data.repoURL && (
+                <Link href={project.data.repoURL} external>
+                  {t('common.repo')}
+                </Link>
+              )}
+            </nav>
+          )
+        }
+      </div>
+    </article>
+  </Container>
+</Layout>

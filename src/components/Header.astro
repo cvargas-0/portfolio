@@ -1,0 +1,27 @@
+---
+import Container from '@/components/Container.astro';
+import Link from '@/components/Link.astro';
+import { SITE } from '@/consts';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<header>
+  <Container>
+    <div class="flex flex-wrap justify-between gap-y-2">
+      <Link href={`/${lang}/`}>
+        <h1 class="font-semibold text-xl">
+          {SITE.NAME}
+          <span class="text-sm">(@{SITE.USERNAME})</span>
+        </h1>
+      </Link>
+      <nav class="flex gap-3">
+        <Link href={`/${lang}/blog`}>{t('nav.blog')}</Link>
+        <Link href={`/${lang}/work`}>{t('nav.work')}</Link>
+        <Link href={`/${lang}/projects`}>{t('nav.projects')}</Link>
+      </nav>
+    </div>
+  </Container>
+</header>

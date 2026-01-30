@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import Container from '@/components/Container.astro';
+import ArrowCard from '@/components/ArrowCard.astro';
+import { useTranslations } from '@/i18n/utils';
+
+export async function getStaticPaths() {
+  return [{ params: { lang: 'es' } }, { params: { lang: 'en' } }];
+}
+
+const { lang } = Astro.params;
+const t = useTranslations(lang as 'en' | 'es');
+
+const projects = (await getCollection('projects'))
+  .filter((project) => !project.data.draft && project.data.lang === lang)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout title={t('projects.title')} description={t('projects.description')}>
+  <Container>
+    <div class="space-y-10">
+      <div class="font-semibold text-black dark:text-white animate">
+        {t('projects.title')}
+      </div>
+      {projects.length === 0 ? (
+        <div class="text-sm text-muted-foreground animate">{t('empty.projects')}</div>
+      ) : (
+        <ul class="flex flex-col gap-4 animate">
+          {projects.map((project) => (
+            <li>
+              <ArrowCard entry={project} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </Container>
+</Layout>

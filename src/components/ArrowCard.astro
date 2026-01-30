@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { stripLangFromSlug } from '@/i18n/utils';
+
+type Props = {
+  entry: CollectionEntry<'blog'> | CollectionEntry<'projects'>;
+};
+
+const { entry } = Astro.props;
+const slug = stripLangFromSlug(entry.slug, entry.data.lang);
+const href = `/${entry.data.lang}/${entry.collection}/${slug}`;
+---
+
+<a
+  href={href}
+  class="group relative flex flex-nowrap hover:bg-black/5 dark:hover:bg-white/5 px-4 py-3 pr-10 border border-black/15 dark:border-white/20 rounded-lg hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+>
+  <div class="flex flex-col flex-1 truncate">
+    <div class="font-semibold">
+      {entry.data.title}
+    </div>
+    <div class="text-sm">
+      {entry.data.description}
+    </div>
+  </div>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    class="top-1/2 right-2 absolute fill-none stroke-2 stroke-current size-5 -translate-y-1/2"
+  >
+    <line
+      x1="5"
+      y1="12"
+      x2="19"
+      y2="12"
+      class="scale-x-0 group-hover:scale-x-100 transition-transform translate-x-3 group-hover:translate-x-0 duration-300 ease-in-out"
+    ></line>
+    <polyline
+      points="12 5 19 12 12 19"
+      class="transition-transform -translate-x-1 group-hover:translate-x-0 duration-300 ease-in-out"
+    ></polyline>
+  </svg>
+</a>
