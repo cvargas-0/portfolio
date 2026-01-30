@@ -43,15 +43,15 @@ const switchLangHref = (targetLang: Lang) => {
         >
       </div>
 
-      <div class="flex items-center gap-1.5 text-muted-foreground text-xs">
+      <div class="flex items-center gap-1 bg-muted p-0.5 rounded-full text-xs">
         <a
           href={switchLangHref('en')}
           data-lang="en"
           class:list={[
-            'no-underline transition-colors',
+            'px-2 py-0.5 rounded-full transition-all no-underline',
             lang === 'en'
-              ? 'text-foreground font-medium'
-              : 'text-muted-foreground hover:text-link',
+              ? 'bg-background text-foreground font-medium shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
           ]}
         >
           EN
@@ -61,10 +61,10 @@ const switchLangHref = (targetLang: Lang) => {
           href={switchLangHref('es')}
           data-lang="es"
           class:list={[
-            'no-underline transition-colors',
+            'px-2 py-0.5 rounded-full transition-all no-underline',
             lang === 'es'
-              ? 'text-foreground font-medium'
-              : 'text-muted-foreground hover:text-link',
+              ? 'bg-background text-foreground font-medium shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
           ]}
         >
           ES
