@@ -4,8 +4,8 @@ description: 'Blynt es una app de finanzas personales intuitiva que te ayuda a t
 date: 2026-01-22
 lang: 'es'
 translationKey: 'blynt'
-URL: 'https://blynt.app'
-repoURL: ''
+URL: ''
+repoURL: 'https://github.com/vrgs-dev/blynt'
 ---
 
 ## Registra tus gastos escribiendo de forma natural
