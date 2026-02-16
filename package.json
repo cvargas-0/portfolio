@@ -21,6 +21,7 @@
     "astro": "^5.17.1",
     "clsx": "^2.1.1",
     "mdx": "^0.3.1",
+    "posthog-js": "^1.347.2",
     "sitemap": "^9.0.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",

@@ -1,19 +1,20 @@
 ---
-import '../styles/global.css';
-import '@fontsource/inter/latin-400.css';
-import '@fontsource/inter/latin-600.css';
-import '@fontsource/lora/400.css';
-import '@fontsource/lora/600.css';
-import inter400 from '@fontsource/inter/files/inter-latin-400-normal.woff2';
-import inter600 from '@fontsource/inter/files/inter-latin-600-normal.woff2';
-import lora400 from '@fontsource/lora/files/lora-latin-400-normal.woff2';
-import lora600 from '@fontsource/lora/files/lora-latin-600-normal.woff2';
+import "../styles/global.css";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/lora/400.css";
+import "@fontsource/lora/600.css";
+import inter400 from "@fontsource/inter/files/inter-latin-400-normal.woff2";
+import inter600 from "@fontsource/inter/files/inter-latin-600-normal.woff2";
+import lora400 from "@fontsource/lora/files/lora-latin-400-normal.woff2";
+import lora600 from "@fontsource/lora/files/lora-latin-600-normal.woff2";
 
-import { ClientRouter } from 'astro:transitions';
-import { SITE } from '@/consts';
-import { SOCIALS } from '@/consts';
-import { defaultLang, languages } from '@/i18n/ui';
-import type { Lang } from '@/i18n/utils';
+import { ClientRouter } from "astro:transitions";
+import { SITE } from "@/consts";
+import { SOCIALS } from "@/consts";
+import { defaultLang, languages } from "@/i18n/ui";
+import type { Lang } from "@/i18n/utils";
+import Posthog from "./posthog.astro";
 
 interface Props {
   title: string;
@@ -26,7 +27,7 @@ interface Props {
 const {
   title,
   description,
-  image = '/og-image.png',
+  image = "/og-image.png",
   lang,
   alternates,
 } = Astro.props as Props;
@@ -34,10 +35,10 @@ const {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(image, Astro.site);
 
-const ogLocale = lang === 'es' ? 'es_ES' : 'en_US';
+const ogLocale = lang === "es" ? "es_ES" : "en_US";
 const ogLocaleAlternates = Object.keys(languages)
   .filter((l) => l !== lang)
-  .map((l) => (l === 'es' ? 'es_ES' : 'en_US'));
+  .map((l) => (l === "es" ? "es_ES" : "en_US"));
 
 const hreflangLinks = Object.keys(languages).map((l) => ({
   lang: l,
@@ -51,31 +52,31 @@ const xDefaultHref = new URL(
 
 const sameAs = SOCIALS.map((s) => s.HREF);
 const ldJson = {
-  '@context': 'https://schema.org',
-  '@graph': [
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      '@type': 'WebSite',
-      '@id': new URL('#website', Astro.site).href,
-      url: new URL('/', Astro.site).href,
+      "@type": "WebSite",
+      "@id": new URL("#website", Astro.site).href,
+      url: new URL("/", Astro.site).href,
       name: SITE.NAME,
       inLanguage: lang,
     },
     {
-      '@type': 'Person',
-      '@id': new URL('#person', Astro.site).href,
+      "@type": "Person",
+      "@id": new URL("#person", Astro.site).href,
       name: SITE.NAME,
       email: `mailto:${SITE.EMAIL}`,
-      url: new URL('/', Astro.site).href,
+      url: new URL("/", Astro.site).href,
       sameAs,
     },
     {
-      '@type': 'WebPage',
-      '@id': canonicalURL.href,
+      "@type": "WebPage",
+      "@id": canonicalURL.href,
       url: canonicalURL.href,
       name: title,
       description,
-      isPartOf: { '@id': new URL('#website', Astro.site).href },
-      about: { '@id': new URL('#person', Astro.site).href },
+      isPartOf: { "@id": new URL("#website", Astro.site).href },
+      about: { "@id": new URL("#person", Astro.site).href },
       inLanguage: lang,
     },
   ],
@@ -95,7 +96,7 @@ const ldJson = {
 <meta name="generator" content={Astro.generator} />
 <meta
   name="robots"
-  content={import.meta.env.PROD ? 'index,follow' : 'noindex,nofollow'}
+  content={import.meta.env.PROD ? "index,follow" : "noindex,nofollow"}
 />
 <meta name="author" content={SITE.NAME} />
 
@@ -149,14 +150,14 @@ const ldJson = {
   rel="alternate"
   type="application/rss+xml"
   title={SITE.NAME}
-  href={new URL('rss.xml', Astro.site)}
+  href={new URL("rss.xml", Astro.site)}
 />
 
 <script type="application/ld+json" set:html={JSON.stringify(ldJson)} />
 
 <script>
-  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
-  document.addEventListener('astro:before-swap', (e) =>
+  import type { TransitionBeforeSwapEvent } from "astro:transitions/client";
+  document.addEventListener("astro:before-swap", (e) =>
     [
       ...(e as TransitionBeforeSwapEvent).newDocument.head.querySelectorAll(
         'link[as="font"]',
@@ -167,48 +168,48 @@ const ldJson = {
 
 <script is:inline>
   function init() {
-    const maybeLang = window.location.pathname.split('/').filter(Boolean)[0];
-    if (maybeLang === 'en' || maybeLang === 'es') {
+    const maybeLang = window.location.pathname.split("/").filter(Boolean)[0];
+    if (maybeLang === "en" || maybeLang === "es") {
       try {
-        localStorage.setItem('preferredLang', maybeLang);
+        localStorage.setItem("preferredLang", maybeLang);
       } catch {}
     }
 
     onScroll();
     animate();
 
-    const backToTop = document.getElementById('back-to-top');
-    backToTop?.addEventListener('click', (event) => scrollToTop(event));
+    const backToTop = document.getElementById("back-to-top");
+    backToTop?.addEventListener("click", (event) => scrollToTop(event));
 
-    const backToPrev = document.getElementById('back-to-prev');
-    backToPrev?.addEventListener('click', () => window.history.back());
+    const backToPrev = document.getElementById("back-to-prev");
+    backToPrev?.addEventListener("click", () => window.history.back());
 
     window
-      .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', (event) => {
-        if (localStorage.theme === 'system' || !localStorage.theme) {
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (event) => {
+        if (localStorage.theme === "system" || !localStorage.theme) {
           toggleTheme(event.matches);
         }
       });
 
-    document.addEventListener('scroll', onScroll);
+    document.addEventListener("scroll", onScroll);
   }
 
   function animate() {
-    const animateElements = document.querySelectorAll('.animate');
+    const animateElements = document.querySelectorAll(".animate");
 
     animateElements.forEach((element, index) => {
       setTimeout(() => {
-        element.classList.add('show');
+        element.classList.add("show");
       }, index * 150);
     });
   }
 
   function onScroll() {
     if (window.scrollY > 0) {
-      document.documentElement.classList.add('scrolled');
+      document.documentElement.classList.add("scrolled");
     } else {
-      document.documentElement.classList.remove('scrolled');
+      document.documentElement.classList.remove("scrolled");
     }
   }
 
@@ -216,12 +217,12 @@ const ldJson = {
     event.preventDefault();
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => init());
-  document.addEventListener('astro:after-swap', () => init());
+  document.addEventListener("DOMContentLoaded", () => init());
+  document.addEventListener("astro:after-swap", () => init());
 </script>
 
 <!-- Google tag (gtag.js) -->
@@ -234,7 +235,8 @@ const ldJson = {
   function gtag() {
     dataLayer.push(arguments);
   }
-  gtag('js', new Date());
+  gtag("js", new Date());
 
-  gtag('config', 'G-G09M4LZH2L');
+  gtag("config", "G-G09M4LZH2L");
 </script>
+<Posthog />

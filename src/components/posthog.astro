@@ -1,0 +1,17 @@
+<script>
+  import posthog from "posthog-js";
+
+  posthog.init(import.meta.env.PUBLIC_POSTHOG_KEY, {
+    api_host: import.meta.env.PUBLIC_POSTHOG_HOST,
+    person_profiles: "identified_only",
+    capture_pageview: false, // We capture manually for View Transitions
+  });
+
+  // Capture pageview on initial load and after View Transition swaps
+  function capturePageview() {
+    posthog.capture("$pageview");
+  }
+
+  capturePageview();
+  document.addEventListener("astro:after-swap", capturePageview);
+</script>
