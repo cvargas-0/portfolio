@@ -29,7 +29,7 @@ const mergedAlternates = { ...defaultAlternates, ...(alternates ?? {}) };
 ---
 
 <!doctype html>
-<html lang={lang} class="dark">
+<html lang={lang}>
   <head>
     <Head
       title={`${title} | ${SITE.NAME}`}
@@ -39,8 +39,8 @@ const mergedAlternates = { ...defaultAlternates, ...(alternates ?? {}) };
     />
   </head>
   <body class="min-h-screen flex flex-col">
-    <Header />
-    <main>
+    <Header alternates={mergedAlternates} />
+    <main class="flex-1 py-28 md:py-32">
       <slot />
     </main>
     <Footer alternates={mergedAlternates} />

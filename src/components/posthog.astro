@@ -4,14 +4,97 @@
   posthog.init(import.meta.env.PUBLIC_POSTHOG_KEY, {
     api_host: import.meta.env.PUBLIC_POSTHOG_HOST,
     person_profiles: "identified_only",
-    capture_pageview: false, // We capture manually for View Transitions
+    capture_pageview: false,
   });
 
-  // Capture pageview on initial load and after View Transition swaps
   function capturePageview() {
     posthog.capture("$pageview");
   }
 
-  capturePageview();
-  document.addEventListener("astro:after-swap", capturePageview);
+  // ─── Section Visibility Tracking ───────────────────────────
+  // Fires once per section when it enters the viewport (50% visible)
+  function trackSections() {
+    const sections = document.querySelectorAll<HTMLElement>("[data-ph-section]");
+    if (sections.length === 0) return;
+
+    const seen = new Set<string>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target as HTMLElement;
+          const name = el.dataset.phSection!;
+          if (seen.has(name)) return;
+          seen.add(name);
+          posthog.capture("section_viewed", { section: name });
+          observer.unobserve(el);
+        });
+      },
+      { threshold: 0.5 },
+    );
+
+    sections.forEach((el) => observer.observe(el));
+  }
+
+  // ─── Click Tracking (delegated) ────────────────────────────
+  // Any element with data-ph-click="event_name" will fire on click
+  // Additional properties via data-ph-* attributes (e.g. data-ph-label="GitHub")
+  function trackClicks() {
+    document.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement).closest<HTMLElement>(
+        "[data-ph-click]",
+      );
+      if (!target) return;
+
+      const eventName = target.dataset.phClick!;
+      const props: Record<string, string> = {};
+
+      // Collect all data-ph-* attributes as properties (except data-ph-click itself)
+      for (const attr of target.attributes) {
+        if (attr.name.startsWith("data-ph-") && attr.name !== "data-ph-click") {
+          const key = attr.name.replace("data-ph-", "").replace(/-/g, "_");
+          props[key] = attr.value;
+        }
+      }
+
+      posthog.capture(eventName, props);
+    });
+  }
+
+  // ─── Scroll Depth Tracking ─────────────────────────────────
+  // Fires at 25%, 50%, 75%, 100% milestones (once each per page)
+  function trackScrollDepth() {
+    const milestones = [25, 50, 75, 100];
+    const reached = new Set<number>();
+
+    function checkDepth() {
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) return;
+
+      const percent = Math.round((scrollTop / docHeight) * 100);
+
+      for (const m of milestones) {
+        if (percent >= m && !reached.has(m)) {
+          reached.add(m);
+          posthog.capture("scroll_depth", { depth: m });
+        }
+      }
+    }
+
+    window.addEventListener("scroll", checkDepth, { passive: true });
+  }
+
+  // ─── Init ──────────────────────────────────────────────────
+  function initTracking() {
+    capturePageview();
+    trackSections();
+    trackClicks();
+    trackScrollDepth();
+  }
+
+  initTracking();
+  document.addEventListener("astro:after-swap", initTracking);
 </script>

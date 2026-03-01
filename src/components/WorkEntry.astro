@@ -1,0 +1,44 @@
+---
+import { dateRange } from "@/lib/utils";
+
+type Props = {
+  href: string;
+  company: string;
+  role: string;
+  dateStart: string | Date;
+  dateEnd?: string | Date;
+  isLast?: boolean;
+};
+
+const { href, company, role, dateStart, dateEnd, isLast = false } = Astro.props;
+---
+
+<a
+  href={href}
+  data-ph-click="work_entry_clicked"
+  data-ph-company={company}
+  class="flex gap-3.5 py-3.5 first:pt-0 transition-all duration-200 no-underline hover:translate-x-0.5 group/work"
+>
+  <div class="flex flex-col items-center shrink-0 pt-1.5">
+    <div
+      class="w-2 h-2 rounded-full bg-primary-200/60 border-2 border-bg-200 shadow-[0_0_0_1.5px_var(--color-primary-200)] shrink-0 transition-all duration-200 group-hover/work:bg-accent-100 group-hover/work:shadow-[0_0_0_1.5px_var(--color-accent-100)]"
+    >
+    </div>
+    {!isLast && <div class="timeline-line" />}
+  </div>
+  <div class="flex-1 min-w-0">
+    <span
+      class="font-display text-[0.6rem] text-primary-100/60 bg-primary-100/6 px-2 py-0.5 rounded-full"
+    >
+      {dateRange(dateStart as Date, dateEnd as Date)}
+    </span>
+    <h3
+      class="font-display text-[0.9rem] font-bold text-text-100 leading-snug mt-1.5 transition-colors group-hover/work:text-primary-100"
+    >
+      {company}
+    </h3>
+    <p class="text-[0.8rem] text-text-200/50 mt-0.5">
+      {role}
+    </p>
+  </div>
+</a>

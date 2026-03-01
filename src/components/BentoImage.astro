@@ -1,0 +1,86 @@
+---
+import GeoShape from "./GeoShape.astro";
+
+type GeoConfig = {
+  variant: "triangle" | "diamond" | "circle" | "ring";
+  size: number;
+  color: string;
+  position: string;
+  animation: string;
+};
+
+type Props = {
+  src: string;
+  alt: string;
+  objectPosition?: string;
+  loading?: "eager" | "lazy";
+  geoSet?: "portrait" | "headshot" | "detail" | "workspace";
+  class?: string;
+};
+
+const {
+  src,
+  alt,
+  objectPosition = "center",
+  loading = "lazy",
+  geoSet = "portrait",
+  class: className = "",
+} = Astro.props;
+
+const geoConfigs: Record<string, GeoConfig[]> = {
+  portrait: [
+    { variant: "triangle", size: 28, color: "var(--color-primary-200)", position: "top-3 right-3", animation: "geo-float-1" },
+    { variant: "ring", size: 22, color: "var(--color-accent-100)", position: "bottom-8 left-4", animation: "geo-drift" },
+  ],
+  headshot: [
+    { variant: "diamond", size: 20, color: "var(--color-primary-100)", position: "top-2 left-2", animation: "geo-float-2" },
+    { variant: "circle", size: 16, color: "var(--color-accent-100)", position: "bottom-3 right-3", animation: "geo-float-3" },
+  ],
+  detail: [
+    { variant: "circle", size: 24, color: "var(--color-primary-300)", position: "top-4 right-4", animation: "geo-float-3" },
+    { variant: "triangle", size: 20, color: "var(--color-accent-100)", position: "bottom-6 left-3", animation: "geo-float-1" },
+  ],
+  workspace: [
+    { variant: "ring", size: 30, color: "var(--color-primary-200)", position: "top-3 left-4", animation: "geo-drift" },
+    { variant: "diamond", size: 18, color: "var(--color-accent-100)", position: "bottom-3 right-6", animation: "geo-float-2" },
+  ],
+};
+
+const shapes = geoConfigs[geoSet] || geoConfigs.portrait;
+---
+
+<div class:list={["bento-image group/img overflow-hidden relative p-0", className]}>
+  <img
+    src={src}
+    alt={alt}
+    class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-[1.03]"
+    style={`object-position: ${objectPosition}`}
+    loading={loading}
+  />
+
+  <!-- Base gradient overlay -->
+  <div class="absolute inset-0 bg-linear-to-t from-bg-100/50 via-bg-100/10 to-transparent pointer-events-none transition-opacity duration-500"></div>
+
+  <!-- Hover gradient deepens -->
+  <div class="absolute inset-0 bg-linear-to-t from-bg-100/30 via-transparent to-bg-100/15 opacity-0 group-hover/img:opacity-100 pointer-events-none transition-opacity duration-500"></div>
+
+  <!-- Geo shapes: hidden by default, appear on hover with staggered delays -->
+  {shapes.map((shape, i) => (
+    <div
+      class:list={[
+        "absolute pointer-events-none will-change-transform",
+        "opacity-0 scale-75 group-hover/img:opacity-25 group-hover/img:scale-100",
+        "transition-all duration-500 ease-out",
+        shape.position,
+        shape.animation,
+      ]}
+      style={`transition-delay: ${i * 80}ms`}
+    >
+      <GeoShape
+        variant={shape.variant}
+        size={shape.size}
+        color={shape.color}
+      />
+    </div>
+  ))}
+</div>

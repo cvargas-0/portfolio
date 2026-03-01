@@ -1,0 +1,39 @@
+---
+type Props = {
+  title: string;
+  href: string;
+  linkText: string;
+};
+
+const { title, href, linkText } = Astro.props;
+---
+
+<div class="flex items-center justify-between mb-5">
+  <h2
+    class="font-display text-[0.75rem] text-text-200/40 uppercase tracking-widest"
+  >
+    {title}
+  </h2>
+  <a
+    href={href}
+    data-ph-click="see_all_clicked"
+    data-ph-section={title}
+    class="text-primary-100/60 font-display text-[0.6rem] flex items-center gap-1 transition-all duration-200 hover:text-primary-100 group/link"
+  >
+    {linkText}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="transition-transform duration-200 group-hover/link:translate-x-0.5"
+    >
+      <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
+    </svg>
+  </a>
+</div>

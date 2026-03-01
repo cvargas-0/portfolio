@@ -1,0 +1,83 @@
+---
+type Props = {
+  variant: "triangle" | "diamond" | "circle" | "ring";
+  size?: number;
+  color?: string;
+  class?: string;
+};
+
+const {
+  variant,
+  size = 40,
+  color = "var(--color-primary-100)",
+  class: className = "",
+} = Astro.props;
+---
+
+{
+  variant === "triangle" && (
+    <svg
+      class={className}
+      width={size}
+      height={Math.round(size * 0.87)}
+      viewBox="0 0 60 52"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <polygon points="30,0 60,52 0,52" fill={color} />
+    </svg>
+  )
+}
+
+{
+  variant === "diamond" && (
+    <svg
+      class={className}
+      width={size}
+      height={size}
+      viewBox="0 0 50 50"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="7.5"
+        y="7.5"
+        width="25"
+        height="25"
+        rx="2"
+        transform="rotate(45 25 25)"
+        fill={color}
+      />
+    </svg>
+  )
+}
+
+{
+  variant === "circle" && (
+    <svg
+      class={className}
+      width={size}
+      height={size}
+      viewBox="0 0 50 50"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="25" cy="25" r="20" fill={color} />
+    </svg>
+  )
+}
+
+{
+  variant === "ring" && (
+    <svg
+      class={className}
+      width={size}
+      height={size}
+      viewBox="0 0 50 50"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="25" cy="25" r="18" stroke={color} stroke-width="2.5" fill="none" />
+    </svg>
+  )
+}

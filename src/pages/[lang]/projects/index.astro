@@ -22,7 +22,7 @@ const projects = (await getCollection('projects'))
     <div class="space-y-10">
       {
         projects.length === 0 ? (
-          <div class="p-8 border border-(--border) border-dashed rounded-xl text-(--text-secondary) text-sm text-center animate">
+          <div class="p-8 border border-(--bg-300) border-dashed rounded-xl text-(--text-200) text-sm text-center animate">
             {t('empty.projects')}
           </div>
         ) : (
@@ -35,7 +35,7 @@ const projects = (await getCollection('projects'))
                 >
                   <div class="z-10 relative flex flex-col h-full">
                     <div class="flex items-center gap-3 mb-3">
-                      <div class="flex justify-center items-center rounded-xl w-10 h-10 bg-(--accent-muted)">
+                      <div class="flex justify-center items-center rounded-xl w-10 h-10 bg-[rgba(46,133,110,0.1)]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="20"
@@ -46,19 +46,19 @@ const projects = (await getCollection('projects'))
                           stroke-width="2"
                           stroke-linecap="round"
                           stroke-linejoin="round"
-                          class="text-(--accent)"
+                          class="text-(--primary-100)"
                         >
                           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                         </svg>
                       </div>
-                      <h3 class="font-semibold text-(--text-primary) group-hover:text-(--accent) text-lg transition-colors">
+                      <h3 class="font-semibold text-(--text-100) group-hover:text-(--primary-100) text-lg transition-colors">
                         {project.data.title}
                       </h3>
                     </div>
-                    <p class="flex-1 mb-4 text-(--text-secondary) text-sm">
+                    <p class="flex-1 mb-4 text-(--text-200) text-sm">
                       {project.data.description}
                     </p>
-                    <div class="flex items-center gap-2 text-(--accent) text-xs">
+                    <div class="flex items-center gap-2 text-(--primary-100) text-xs">
                       <span>View project</span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

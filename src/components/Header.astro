@@ -1,48 +1,73 @@
 ---
-import Container from '@/components/Container.astro';
-import { SITE } from '@/consts';
-import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import {
+  getLangFromUrl,
+  getRouteFromUrl,
+  localizePath,
+  useTranslations,
+  type Lang,
+} from "@/i18n/utils";
+
+type Props = {
+  alternates?: Partial<Record<Lang, string>>;
+};
+
+const { alternates } = Astro.props as Props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
+const route = getRouteFromUrl(Astro.url);
 
 const navItems = [
-  { href: `/${lang}/blog`, label: t('nav.blog') },
-  { href: `/${lang}/work`, label: t('nav.work') },
-  { href: `/${lang}/projects`, label: t('nav.projects') },
+  { href: `/${lang}`, label: t("nav.home") },
+  { href: `/${lang}/blog`, label: t("nav.blog") },
+  { href: `/${lang}/work`, label: t("nav.work") },
+  { href: `/${lang}/projects`, label: t("nav.projects") },
 ];
 
-const isActive = (href: string) => currentPath.startsWith(href);
+const isActive = (href: string) => {
+  if (href === `/${lang}`)
+    return currentPath === `/${lang}` || currentPath === `/${lang}/`;
+  return currentPath.startsWith(href);
+};
+
+const switchLangHref = (targetLang: Lang) => {
+  return alternates?.[targetLang] ?? localizePath(targetLang, route);
+};
+
+const otherLang = lang === "en" ? "es" : "en";
+const otherLangLabel = lang === "en" ? "ES" : "EN";
 ---
 
-<header>
-  <Container>
-    <div class="flex flex-wrap justify-between items-center gap-y-2">
-      <a href={`/${lang}/`} class="group flex items-center gap-3">
-        <div class="flex flex-col">
-          <span class="font-semibold text-(--text-primary) leading-tight">
-            {SITE.NAME}
-          </span>
-        </div>
-      </a>
-      <nav class="flex items-center gap-1">
-        {
-          navItems.map(({ href, label }) => (
-            <a
-              href={href}
-              class:list={[
-                'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-                isActive(href)
-                  ? 'bg-(--accent-muted) text-(--accent)'
-                  : 'text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--surface-elevated)',
-              ]}
-            >
-              {label}
-            </a>
-          ))
-        }
-      </nav>
-    </div>
-  </Container>
+<header class="fixed top-0 left-0 right-0 z-50 px-5 py-4 pointer-events-none">
+  <div
+    class="max-w-md mx-auto flex items-center justify-center gap-1 px-2 py-2 rounded-full border border-bg-300 bg-bg-100/85 backdrop-blur-xl backdrop-saturate-180 pointer-events-auto"
+  >
+    <nav class="flex items-center gap-1">
+      {
+        navItems.map(({ href, label }) => (
+          <a
+            href={href}
+            data-ph-click="nav_clicked"
+            data-ph-destination={label}
+            class:list={[
+              "font-display text-[0.8rem] font-normal px-4 py-1.5 rounded-full text-text-200 transition-all duration-200",
+              "hover:text-text-100 hover:bg-bg-300/40",
+              isActive(href) && "text-primary-100! bg-primary-100/15!",
+            ]}
+          >
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+    <a
+      href={switchLangHref(otherLang)}
+      data-ph-click="lang_switched"
+      data-ph-target-lang={otherLang}
+      class="font-display text-[0.6rem] px-2.5 py-1 rounded-full text-text-200 opacity-60 tracking-wide transition-all duration-200 hover:text-primary-100 hover:opacity-100 hover:bg-primary-100/12"
+    >
+      {otherLangLabel}
+    </a>
+  </div>
 </header>

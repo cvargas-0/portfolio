@@ -38,15 +38,15 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
       <div class="space-y-8">
         {
           years.length === 0 ? (
-            <div class="p-8 border border-(--border) border-dashed rounded-xl text-(--text-secondary) text-sm text-center animate">
+            <div class="p-8 border border-(--bg-300) border-dashed rounded-xl text-(--text-200) text-sm text-center animate">
               {t('empty.blog')}
             </div>
           ) : (
             years.map((year) => (
               <section class="space-y-4 animate">
                 <div class="flex items-center gap-3">
-                  <span class="font-bold text-(--accent) text-lg">{year}</span>
-                  <div class="flex-1 bg-(--border) h-px" />
+                  <span class="font-bold text-(--primary-100) text-lg">{year}</span>
+                  <div class="flex-1 bg-(--bg-300) h-px" />
                 </div>
                 <ul class="flex flex-col gap-4">
                   {posts[year].map((post) => (

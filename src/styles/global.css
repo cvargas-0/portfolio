@@ -1,30 +1,28 @@
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 
-/* Custom Properties - Terminal Elegance Theme */
-:root {
-  --accent: #10b981;
-  --accent-light: #34d399;
-  --accent-muted: #10b98120;
-  --surface: #fafaf9;
-  --surface-elevated: #ffffff;
-  --text-primary: #1c1917;
-  --text-secondary: #78716c;
-  --border: #e7e5e4;
-  --border-hover: #d6d3d1;
+/* ========================================
+   Theme Tokens
+   ======================================== */
+
+@theme {
+  --color-primary-100: #2E856E;
+  --color-primary-200: #61b59c;
+  --color-primary-300: #c5ffff;
+  --color-accent-100: #FFD700;
+  --color-accent-200: #917800;
+  --color-text-100: #F0F4F3;
+  --color-text-200: #bec1c0;
+  --color-bg-100: #151e24;
+  --color-bg-200: #1c2830;
+  --color-bg-300: #2e3d46;
+  --font-display: 'Space Mono', monospace;
+  --font-body: 'DM Sans', sans-serif;
 }
 
-.dark {
-  --accent: #10b981;
-  --accent-light: #6ee7b7;
-  --accent-muted: #10b98115;
-  --surface: #0c0a09;
-  --surface-elevated: #1c1917;
-  --text-primary: #fafaf9;
-  --text-secondary: #a8a29e;
-  --border: #292524;
-  --border-hover: #44403c;
-}
+/* ========================================
+   Base
+   ======================================== */
 
 html {
   overflow-y: scroll;
@@ -33,91 +31,101 @@ html {
 }
 
 body {
-  @apply antialiased;
-  background: var(--surface);
-  color: var(--text-secondary);
+  @apply antialiased bg-bg-100 text-text-200 font-body;
 }
 
-/* Subtle grid background pattern */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 60px 60px;
-  opacity: 0.3;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(46, 133, 110, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(255, 215, 0, 0.06) 0%, transparent 60%);
   pointer-events: none;
   z-index: -1;
 }
 
-/* Selection style */
 ::selection {
-  background: var(--accent);
-  color: var(--surface);
+  background: var(--color-primary-100);
+  color: white;
 }
 
-header {
-  @apply fixed top-0 left-0 right-0 z-50 py-4;
-  background: color-mix(in srgb, var(--surface) 85%, transparent);
-  backdrop-filter: blur(12px) saturate(180%);
-  border-bottom: 1px solid var(--border);
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
 }
 
-main {
-  @apply flex-1 py-28 md:py-32;
+button { cursor: pointer; }
+
+/* ========================================
+   Bento Grid
+   ======================================== */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
-footer {
-  @apply py-6 text-sm;
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
+
+.bento-cell {
+  @apply bg-bg-200 border border-bg-300/60 rounded-2xl relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bento-cell:hover {
+  border-color: var(--color-bg-300);
+  box-shadow: 0 4px 24px -8px rgba(46, 133, 110, 0.08);
+}
+
+/* ========================================
+   Prose (article)
+   ======================================== */
 
 article {
-  @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-  @apply prose-headings:font-semibold prose-p:font-serif;
-  @apply prose-headings:text-black prose-headings:dark:text-white;
+  @apply max-w-full prose prose-invert prose-img:mx-auto prose-img:my-auto;
+  @apply prose-headings:font-semibold prose-headings:text-text-100;
+}
+
+article p {
+  font-family: var(--font-body);
 }
 
 @layer utilities {
   article a {
-    @apply font-sans;
-    color: var(--accent);
-    text-decoration-color: var(--accent-muted);
+    font-family: var(--font-body);
+    color: var(--color-primary-100);
+    text-decoration-color: rgba(46, 133, 110, 0.3);
     text-underline-offset: 3px;
     @apply transition-all duration-300 ease-in-out;
   }
   article a:hover {
-    color: var(--accent-light);
-    text-decoration-color: var(--accent);
+    color: var(--color-primary-200);
+    text-decoration-color: var(--color-primary-100);
   }
 }
 
-/* Animations */
+/* ========================================
+   Animations
+   ======================================== */
+
 .animate {
-  @apply opacity-0 translate-y-4;
-  @apply transition-all duration-700 ease-out;
+  @apply opacity-0 translate-y-4 transition-all duration-700 ease-out;
 }
 
 .animate.show {
   @apply opacity-100 translate-y-0;
 }
 
-/* Staggered animation delays */
-.animate-delay-1 {
-  transition-delay: 100ms;
-}
-.animate-delay-2 {
-  transition-delay: 200ms;
-}
-.animate-delay-3 {
-  transition-delay: 300ms;
-}
-.animate-delay-4 {
-  transition-delay: 400ms;
-}
-.animate-delay-5 {
-  transition-delay: 500ms;
-}
+.animate-delay-1 { transition-delay: 100ms; }
+.animate-delay-2 { transition-delay: 200ms; }
+.animate-delay-3 { transition-delay: 300ms; }
+.animate-delay-4 { transition-delay: 400ms; }
+.animate-delay-5 { transition-delay: 500ms; }
 
 html #back-to-top {
   @apply opacity-0 pointer-events-none;
@@ -130,129 +138,76 @@ html.scrolled #back-to-top {
   transform: translateY(0);
 }
 
-button {
-  cursor: pointer;
+/* ========================================
+   Keyframes
+   ======================================== */
+
+@keyframes geo-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-15px) rotate(3deg); }
+  66% { transform: translateY(8px) rotate(-2deg); }
 }
 
-/* Card hover effects */
-.card-interactive {
-  position: relative;
-  background: var(--surface-elevated);
-  border: 1px solid var(--border);
-  @apply rounded-xl transition-all duration-300 ease-out;
+@keyframes geo-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.card-interactive::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  @apply rounded-xl;
-  background: linear-gradient(135deg, var(--accent-muted), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.card-interactive:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px -10px var(--accent-muted);
-}
-
-.card-interactive:hover::before {
-  opacity: 1;
-}
-
-/* Section titles with accent */
-.section-title {
-  color: var(--text-primary);
-  @apply font-semibold text-lg;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.section-title::before {
-  content: '';
-  width: 3px;
-  height: 1.25em;
-  background: var(--accent);
-  border-radius: 2px;
-}
-
-/* Link with arrow animation */
-.link-arrow {
-  color: var(--accent);
-  @apply text-sm font-medium flex items-center gap-1;
-  transition: all 0.3s ease;
-}
-
-.link-arrow svg {
-  transition: transform 0.3s ease;
-}
-
-.link-arrow:hover {
-  color: var(--accent-light);
-  gap: 0.5rem;
-}
-
-.link-arrow:hover svg {
-  transform: translateX(3px);
-}
-
-/* Status indicator */
-.status-badge {
-  @apply inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full;
-  background: var(--accent-muted);
-  color: var(--accent);
-  border: 1px solid var(--accent);
-}
-
-.status-badge::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: pulse-dot 2s ease-in-out infinite;
+@keyframes geo-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -12px) rotate(5deg); }
+  50% { transform: translate(-5px, -20px) rotate(-3deg); }
+  75% { transform: translate(-12px, -8px) rotate(2deg); }
 }
 
 @keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.2);
-  }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
 }
 
-/* Terminal-style code accent */
-.terminal-text {
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-  color: var(--accent);
+/* Geo animation classes */
+.geo-float-1 { animation: geo-float 8s ease-in-out infinite; }
+.geo-float-2 { animation: geo-float 10s ease-in-out infinite reverse; }
+.geo-float-3 { animation: geo-float 12s ease-in-out infinite; animation-delay: -3s; }
+.geo-spin { animation: geo-spin-slow 20s linear infinite; }
+.geo-drift { animation: geo-drift 14s ease-in-out infinite; }
+
+/* Status badge pulse dot */
+.status-dot {
+  @apply w-1.5 h-1.5 rounded-full bg-primary-100;
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* Gradient text for special emphasis */
+/* About accent gradient bar */
+.about-accent-bar {
+  @apply w-0.75 shrink-0 rounded-sm;
+  background: linear-gradient(180deg, var(--color-primary-100), var(--color-accent-100) 60%, transparent);
+}
+
+/* Timeline gradient line */
+.timeline-line {
+  @apply w-0.5 flex-1 mt-2 rounded-sm;
+  background: linear-gradient(180deg, var(--color-primary-200), var(--color-bg-300));
+}
+
+/* Project card corner fold */
+.project-card-corner {
+  @apply absolute top-0 right-0 w-10 h-10 opacity-20 transition-opacity duration-300;
+  background: linear-gradient(135deg, transparent 50%, var(--color-primary-200) 50%);
+}
+
+/* Gradient text utility */
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  background: linear-gradient(135deg, var(--color-primary-100), var(--color-accent-100));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Social link pills */
-.social-pill {
-  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium;
-  background: var(--surface-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  transition: all 0.3s ease;
-}
-
-.social-pill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-muted);
+/* Post description clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

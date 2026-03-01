@@ -1,0 +1,48 @@
+---
+type Props = {
+  href: string;
+  title: string;
+  description: string;
+  readLabel?: string;
+};
+
+const { href, title, description, readLabel = "Read" } = Astro.props;
+---
+
+<a
+  href={href}
+  data-ph-click="blog_post_clicked"
+  data-ph-title={title}
+  class="flex flex-col p-4 rounded-xl bg-bg-100/30 border border-transparent transition-all duration-200 hover:border-primary-200/30 hover:bg-bg-100/60 group/blog"
+>
+  <h3
+    class="font-display text-[0.85rem] font-bold text-text-100 mb-2 leading-snug transition-colors group-hover/blog:text-primary-100"
+  >
+    {title}
+  </h3>
+  <p class="text-[0.78rem] text-text-200/50 leading-relaxed line-clamp-2 flex-1">
+    {description}
+  </p>
+  <div
+    class="flex items-center gap-1 mt-3 text-primary-100/40 group-hover/blog:text-primary-100/70 transition-colors"
+  >
+    <span class="font-display text-[0.6rem] uppercase tracking-wider">
+      {readLabel}
+    </span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="transition-transform duration-200 group-hover/blog:translate-x-0.5"
+    >
+      <path d="M7 17L17 7"></path>
+      <path d="M7 7h10v10"></path>
+    </svg>
+  </div>
+</a>

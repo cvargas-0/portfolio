@@ -2,80 +2,34 @@
 import Container from '@/components/Container.astro';
 import { SITE } from '@/consts';
 import BackToTop from '@/components/BackToTop.astro';
-import {
-  getLangFromUrl,
-  getRouteFromUrl,
-  localizePath,
-  type Lang,
-} from '@/i18n/utils';
+import { getLangFromUrl } from '@/i18n/utils';
 import { useTranslations } from '@/i18n/utils';
 
-type Props = {
-  alternates?: Partial<Record<Lang, string>>;
-};
-
-const { alternates } = Astro.props as Props;
-
 const currentYear = new Date().getFullYear();
-const route = getRouteFromUrl(Astro.url);
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-const switchLangHref = (targetLang: Lang) => {
-  return alternates?.[targetLang] ?? localizePath(targetLang, route);
-};
 ---
 
-<footer class="animate">
+<footer class="py-6 text-sm animate">
   <Container>
     <div class="relative">
-      <div class="-top-16 right-0 absolute">
+      <div class="absolute -top-16 right-0">
         <BackToTop label={t('common.backToTop')} />
       </div>
     </div>
 
-    <div class="flex flex-wrap justify-between items-center gap-4">
-      <div class="flex items-center gap-2 text-(--text-secondary)">
-        <span class="text-(--accent)">&copy;</span>
-        {currentYear}
-        <span class="text-(--border)">·</span>
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div class="flex items-center gap-2 text-[0.8rem] text-text-200 font-display">
+        <span class="text-primary-100">&copy;</span>
+        <span>{currentYear}</span>
+        <span class="text-bg-300">&middot;</span>
         <a
-          href="https://x.com/vrgs_0"
+          href="https://x.com/cvargas_0"
           target="_blank"
           rel="noopener noreferrer"
-          class="hover:text-(--accent) transition-colors"
+          class="text-text-200 transition-colors duration-200 hover:text-primary-100"
         >
           {SITE.NAME}
-        </a>
-      </div>
-
-      <div
-        class="flex items-center gap-1 p-1 rounded-lg bg-(--surface-elevated) border border-(--border)"
-      >
-        <a
-          href={switchLangHref('en')}
-          data-lang="en"
-          class:list={[
-            'px-3 py-1.5 rounded-md text-xs font-medium transition-all no-underline',
-            lang === 'en'
-              ? 'bg-(--accent) text-white'
-              : 'text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--accent-muted)',
-          ]}
-        >
-          EN
-        </a>
-
-        <a
-          href={switchLangHref('es')}
-          data-lang="es"
-          class:list={[
-            'px-3 py-1.5 rounded-md text-xs font-medium transition-all no-underline',
-            lang === 'es'
-              ? 'bg-(--accent) text-white'
-              : 'text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--accent-muted)',
-          ]}
-        >
-          ES
         </a>
       </div>
     </div>

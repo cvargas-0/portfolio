@@ -13,7 +13,7 @@ const { href, external, ...rest } = Astro.props;
   href={href}
   target={external ? '_blank' : '_self'}
   class={cn(
-    'inline-block text-current hover:dark:text-white hover:text-black decoration-black/15 hover:dark:decoration-white/50 hover:decoration-black/25 dark:decoration-white/30 transition-colors duration-300 ease-in-out',
+    'inline-block text-current hover:text-(--primary-100) decoration-(--bg-300) hover:decoration-(--primary-200) transition-colors duration-300 ease-in-out',
   )}
   {...rest}
 >
